@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="800.0" prefWidth="1200.0" stylesheets="@../css/style.css"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="rs.autoservice.controller.MainController">
+
+    <!-- Gornje Zaglavlje -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="header-bar">
+            <Label text="🚗" style="-fx-font-size: 28px;" />
+            <VBox HBox.hgrow="ALWAYS">
+                <Label styleClass="header-title" text="Auto Servis Management System" />
+                <Label styleClass="header-subtitle" text="CS202 Projektni rad – Sistem za upravljanje servisom i zakazivanje termina" />
+            </VBox>
+            <HBox alignment="CENTER" spacing="12.0">
+                <Label fx:id="userBadgeLabel" styleClass="user-badge" text="👤 Administrator (ADMIN)" />
+                <Button onAction="#handleLogout" styleClass="btn-danger" text="Odjavi se" />
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- Glavni Sadržaj sa Tabovima -->
+    <center>
+        <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
+
+            <!-- ==================================================== -->
+            <!-- TAB 1: POČETNA / DASHBOARD                           -->
+            <!-- ==================================================== -->
+            <Tab text="🏠 Početna">
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+                    <VBox spacing="20.0">
+                        <padding>
+                            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                        </padding>
+
+                        <!-- KPI Kartice -->
+                        <GridPane hgap="16.0" vgap="16.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
+                            </columnConstraints>
+
+                            <rowConstraints>
+                                <RowConstraints vgrow="ALWAYS" />
+                            </rowConstraints>
+
+                            <!-- Klijenti KPI -->
+                            <HBox alignment="CENTER_LEFT" spacing="16.0" styleClass="kpi-card" GridPane.columnIndex="0">
+                                <Label styleClass="kpi-icon" text="👥" />
+                                <VBox spacing="4.0">
+                                    <Label styleClass="kpi-title" text="UKUPNO KLIJENATA" />
+                                    <Label fx:id="dashClientsCount" styleClass="kpi-value" text="0" />
+                                </VBox>
+                            </HBox>
+
+                            <!-- Vozila KPI -->
+                            <HBox alignment="CENTER_LEFT" spacing="16.0" styleClass="kpi-card" GridPane.columnIndex="1">
+                                <Label styleClass="kpi-icon" text="🚙" />
+                                <VBox spacing="4.0">
+                                    <Label styleClass="kpi-title" text="EVIDENTIRANA VOZILA" />
+                                    <Label fx:id="dashVehiclesCount" styleClass="kpi-value" text="0" />
+                                </VBox>
+                            </HBox>
+
+                            <!-- Termini KPI -->
+                            <HBox alignment="CENTER_LEFT" spacing="16.0" styleClass="kpi-card" GridPane.columnIndex="2">
+                                <Label styleClass="kpi-icon" text="📅" />
+                                <VBox spacing="4.0">
+                                    <Label styleClass="kpi-title" text="AKTIVNI TERMINI" />
+                                    <Label fx:id="dashAppointmentsCount" styleClass="kpi-value" text="0" />
+                                </VBox>
+                            </HBox>
+
+                            <!-- Prihod KPI -->
+                            <HBox alignment="CENTER_LEFT" spacing="16.0" styleClass="kpi-card" GridPane.columnIndex="3">
+                                <Label styleClass="kpi-icon" text="💰" />
+                                <VBox spacing="4.0">
+                                    <Label styleClass="kpi-title" text="UKUPAN PRIHOD" />
+                                    <Label fx:id="dashRevenue" styleClass="kpi-value" text="0.00 RSD" />
+                                </VBox>
+                            </HBox>
+                        </GridPane>
+
+                        <!-- Brze akcije i dobrodošlica -->
+                        <HBox spacing="16.0">
+                            <VBox spacing="12.0" styleClass="card" HBox.hgrow="ALWAYS">
+                                <Label styleClass="card-title" text="⚡ Brze Akcije" />
+                                <HBox spacing="10.0">
+                                    <Button onAction="#switchToAppointments" styleClass="btn-primary" text="📅 Zakaži novi termin" />
+                                    <Button onAction="#switchToCustomers" styleClass="btn-secondary" text="👥 Dodaj novog klijenta" />
+                                    <Button onAction="#switchToVehicles" styleClass="btn-secondary" text="🚙 Evidentiraj vozilo" />
+                                    <Button onAction="#refreshAllData" styleClass="btn-secondary" text="🔄 Osveži sve podatke" />
+                                </HBox>
+                            </VBox>
+                        </HBox>
+
+                        <!-- Tabela poslednjih zakazanih termina na Dashboardu -->
+                        <VBox spacing="12.0" styleClass="card">
+                            <Label styleClass="card-title" text="🕒 Poslednji Zakazani Termini" />
+                            <TableView fx:id="dashAppointmentsTable" prefHeight="260.0">
+                                <columns>
+                                    <TableColumn fx:id="dashColId" prefWidth="50.0" text="ID" />
+                                    <TableColumn fx:id="dashColDate" prefWidth="90.0" text="Datum" />
+                                    <TableColumn fx:id="dashColTime" prefWidth="70.0" text="Vreme" />
+                                    <TableColumn fx:id="dashColCustomer" prefWidth="180.0" text="Klijent" />
+                                    <TableColumn fx:id="dashColVehicle" prefWidth="180.0" text="Vozilo" />
+                                    <TableColumn fx:id="dashColService" prefWidth="180.0" text="Usluga" />
+                                    <TableColumn fx:id="dashColStatus" prefWidth="110.0" text="Status" />
+                                    <TableColumn fx:id="dashColPrice" prefWidth="100.0" text="Cena (RSD)" />
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+
+            <!-- ==================================================== -->
+            <!-- ==================================================== -->
+            <!-- TAB 2: KLIJENTI (CUSTOMERS)                          -->
+            <!-- ==================================================== -->
+            <Tab text="👥 Klijenti">
+                <HBox spacing="16.0">
+                    <padding>
+                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                    </padding>
+
+                    <!-- Leva strana: Tabela i pretraga -->
+                    <VBox spacing="12.0" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label text="🔍 Pretraga:" style="-fx-font-weight: bold;" />
+                            <TextField fx:id="customerSearchField" promptText="Pretraži po imenu, prezimenu, telefonu ili email-u..." HBox.hgrow="ALWAYS" />
+                            <Button onAction="#handleClearCustomerSearch" styleClass="btn-secondary" text="Poništi" />
+                        </HBox>
+
+                        <TableView fx:id="customersTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colCustId" prefWidth="50.0" text="ID" />
+                                <TableColumn fx:id="colCustFirstName" prefWidth="140.0" text="Ime" />
+                                <TableColumn fx:id="colCustLastName" prefWidth="150.0" text="Prezime" />
+                                <TableColumn fx:id="colCustPhone" prefWidth="140.0" text="Telefon" />
+                                <TableColumn fx:id="colCustEmail" prefWidth="200.0" text="Email" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Desna strana: Forma u ScrollPane-u -->
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" minWidth="320.0" prefWidth="340.0" style="-fx-background-color: transparent;">
+                        <VBox spacing="14.0" styleClass="card">
+                            <Label styleClass="card-title" text="Podaci o Klijentu" />
+                            <Separator />
+
+                            <VBox spacing="4.0">
+                                <Label text="Ime klijenta: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="custFirstNameField" promptText="npr. Marko" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Prezime klijenta: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="custLastNameField" promptText="npr. Petrović" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Broj telefona: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="custPhoneField" promptText="npr. +381641234567" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Email adresa: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="custEmailField" promptText="npr. marko@gmail.com" />
+                            </VBox>
+
+                            <VBox spacing="8.0" style="-fx-padding: 10px 0 0 0;">
+                                <Button maxWidth="Infinity" onAction="#handleSaveCustomer" styleClass="btn-primary" text="➕ Dodaj novog klijenta" />
+                                <Button maxWidth="Infinity" onAction="#handleUpdateCustomer" styleClass="btn-warning" text="✏️ Sačuvaj izmene" />
+                                <Button maxWidth="Infinity" onAction="#handleDeleteCustomer" styleClass="btn-danger" text="🗑️ Obriši klijenta" />
+                                <Button maxWidth="Infinity" onAction="#handleClearCustomerForm" styleClass="btn-secondary" text="🧹 Očisti formu" />
+                            </VBox>
+                        </VBox>
+                    </ScrollPane>
+                </HBox>
+            </Tab>
+
+            <!-- ==================================================== -->
+            <!-- TAB 3: VOZILA (VEHICLES)                             -->
+            <!-- ==================================================== -->
+            <Tab text="🚙 Vozila">
+                <HBox spacing="16.0">
+                    <padding>
+                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                    </padding>
+
+                    <!-- Leva strana: Tabela -->
+                    <VBox spacing="12.0" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label text="🔍 Pretraga:" style="-fx-font-weight: bold;" />
+                            <TextField fx:id="vehicleSearchField" promptText="Pretraži po marki, modelu, tablicama ili vlasniku..." HBox.hgrow="ALWAYS" />
+                            <Button onAction="#handleClearVehicleSearch" styleClass="btn-secondary" text="Poništi" />
+                        </HBox>
+
+                        <TableView fx:id="vehiclesTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colVehId" prefWidth="50.0" text="ID" />
+                                <TableColumn fx:id="colVehOwner" prefWidth="180.0" text="Vlasnik" />
+                                <TableColumn fx:id="colVehBrand" prefWidth="140.0" text="Marka" />
+                                <TableColumn fx:id="colVehModel" prefWidth="140.0" text="Model" />
+                                <TableColumn fx:id="colVehYear" prefWidth="80.0" text="Godina" />
+                                <TableColumn fx:id="colVehPlate" prefWidth="120.0" text="Tablice" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Desna strana: Forma u ScrollPane-u -->
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" minWidth="320.0" prefWidth="340.0" style="-fx-background-color: transparent;">
+                        <VBox spacing="14.0" styleClass="card">
+                            <Label styleClass="card-title" text="Podaci o Vozilu" />
+                            <Separator />
+
+                            <VBox spacing="4.0">
+                                <Label text="Vlasnik vozila (Klijent): *" style="-fx-font-weight: bold;" />
+                                <ComboBox fx:id="vehOwnerCombo" maxWidth="Infinity" promptText="Izaberite klijenta..." />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Marka: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="vehBrandField" promptText="npr. Volkswagen" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Model: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="vehModelField" promptText="npr. Golf 7 2.0 TDI" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Godina proizvodnje: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="vehYearField" promptText="npr. 2018" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Registarska oznaka: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="vehPlateField" promptText="npr. BG-123-AA" />
+                            </VBox>
+
+                            <VBox spacing="8.0" style="-fx-padding: 10px 0 0 0;">
+                                <Button maxWidth="Infinity" onAction="#handleSaveVehicle" styleClass="btn-primary" text="➕ Dodaj novo vozilo" />
+                                <Button maxWidth="Infinity" onAction="#handleUpdateVehicle" styleClass="btn-warning" text="✏️ Sačuvaj izmene" />
+                                <Button maxWidth="Infinity" onAction="#handleDeleteVehicle" styleClass="btn-danger" text="🗑️ Obriši vozilo" />
+                                <Button maxWidth="Infinity" onAction="#handleClearVehicleForm" styleClass="btn-secondary" text="🧹 Očisti formu" />
+                            </VBox>
+                        </VBox>
+                    </ScrollPane>
+                </HBox>
+            </Tab>
+
+            <!-- ==================================================== -->
+            <!-- TAB 4: ZAPOSLENI (EMPLOYEES)                         -->
+            <!-- ==================================================== -->
+            <Tab text="👨‍🔧 Zaposleni">
+                <HBox spacing="16.0">
+                    <padding>
+                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                    </padding>
+
+                    <!-- Leva strana: Tabela -->
+                    <VBox spacing="12.0" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label text="🔍 Pretraga:" style="-fx-font-weight: bold;" />
+                            <TextField fx:id="employeeSearchField" promptText="Pretraži po imenu, poziciji ili telefonu..." HBox.hgrow="ALWAYS" />
+                            <Button onAction="#handleClearEmployeeSearch" styleClass="btn-secondary" text="Poništi" />
+                        </HBox>
+
+                        <TableView fx:id="employeesTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colEmpId" prefWidth="50.0" text="ID" />
+                                <TableColumn fx:id="colEmpFirstName" prefWidth="140.0" text="Ime" />
+                                <TableColumn fx:id="colEmpLastName" prefWidth="150.0" text="Prezime" />
+                                <TableColumn fx:id="colEmpPosition" prefWidth="180.0" text="Radno mesto / Pozicija" />
+                                <TableColumn fx:id="colEmpPhone" prefWidth="150.0" text="Kontakt telefon" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Desna strana: Forma u ScrollPane-u -->
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" minWidth="320.0" prefWidth="340.0" style="-fx-background-color: transparent;">
+                        <VBox spacing="14.0" styleClass="card">
+                            <Label styleClass="card-title" text="Podaci o Zaposlenom" />
+                            <Separator />
+
+                            <VBox spacing="4.0">
+                                <Label text="Ime: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="empFirstNameField" promptText="npr. Petar" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Prezime: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="empLastNameField" promptText="npr. Marković" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Pozicija / Struka: *" style="-fx-font-weight: bold;" />
+                                <ComboBox fx:id="empPositionCombo" editable="true" maxWidth="Infinity" promptText="Izaberite poziciju..." />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Kontakt telefon: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="empPhoneField" promptText="npr. +381648881122" />
+                            </VBox>
+
+                            <VBox spacing="8.0" style="-fx-padding: 10px 0 0 0;">
+                                <Button maxWidth="Infinity" onAction="#handleSaveEmployee" styleClass="btn-primary" text="➕ Dodaj zaposlenog" />
+                                <Button maxWidth="Infinity" onAction="#handleUpdateEmployee" styleClass="btn-warning" text="✏️ Sačuvaj izmene" />
+                                <Button maxWidth="Infinity" onAction="#handleDeleteEmployee" styleClass="btn-danger" text="🗑️ Obriši zaposlenog" />
+                                <Button maxWidth="Infinity" onAction="#handleClearEmployeeForm" styleClass="btn-secondary" text="🧹 Očisti formu" />
+                            </VBox>
+                        </VBox>
+                    </ScrollPane>
+                </HBox>
+            </Tab>
+
+            <!-- ==================================================== -->
+            <!-- TAB 5: USLUGE (SERVICES)                             -->
+            <!-- ==================================================== -->
+            <Tab text="🔧 Cenovnik Usluga">
+                <HBox spacing="16.0">
+                    <padding>
+                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                    </padding>
+
+                    <!-- Leva strana: Tabela -->
+                    <VBox spacing="12.0" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label text="🔍 Pretraga:" style="-fx-font-weight: bold;" />
+                            <TextField fx:id="serviceSearchField" promptText="Pretraži po nazivu usluge ili opisu..." HBox.hgrow="ALWAYS" />
+                            <Button onAction="#handleClearServiceSearch" styleClass="btn-secondary" text="Poništi" />
+                        </HBox>
+
+                        <TableView fx:id="servicesTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colServId" prefWidth="50.0" text="ID" />
+                                <TableColumn fx:id="colServName" prefWidth="200.0" text="Naziv usluge" />
+                                <TableColumn fx:id="colServPrice" prefWidth="120.0" text="Cena (RSD)" />
+                                <TableColumn fx:id="colServDuration" prefWidth="110.0" text="Trajanje (min)" />
+                                <TableColumn fx:id="colServDesc" prefWidth="250.0" text="Opis rada" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Desna strana: Forma u ScrollPane-u -->
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" minWidth="320.0" prefWidth="340.0" style="-fx-background-color: transparent;">
+                        <VBox spacing="14.0" styleClass="card">
+                            <Label styleClass="card-title" text="Podaci o Usluzi" />
+                            <Separator />
+
+                            <VBox spacing="4.0">
+                                <Label text="Naziv usluge: *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="servNameField" promptText="npr. Mali servis" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Cena usluge (RSD): *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="servPriceField" promptText="npr. 9500" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Trajanje (minuti): *" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="servDurationField" promptText="npr. 60" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Opis usluge:" style="-fx-font-weight: bold;" />
+                                <TextArea fx:id="servDescField" prefRowCount="3" promptText="Detaljan opis radova i zamenjenih delova..." wrapText="true" />
+                            </VBox>
+
+                            <VBox spacing="8.0" style="-fx-padding: 10px 0 0 0;">
+                                <Button maxWidth="Infinity" onAction="#handleSaveService" styleClass="btn-primary" text="➕ Dodaj novu uslugu" />
+                                <Button maxWidth="Infinity" onAction="#handleUpdateService" styleClass="btn-warning" text="✏️ Sačuvaj izmene" />
+                                <Button maxWidth="Infinity" onAction="#handleDeleteService" styleClass="btn-danger" text="🗑️ Obriši uslugu" />
+                                <Button maxWidth="Infinity" onAction="#handleClearServiceForm" styleClass="btn-secondary" text="🧹 Očisti formu" />
+                            </VBox>
+                        </VBox>
+                    </ScrollPane>
+                </HBox>
+            </Tab>
+
+            <!-- ==================================================== -->
+            <!-- TAB 6: TERMINI (APPOINTMENTS - GLAVNI MODUL)        -->
+            <!-- ==================================================== -->
+            <Tab text="📅 Zakazivanje Termina">
+                <HBox spacing="16.0">
+                    <padding>
+                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                    </padding>
+
+                    <!-- Leva strana: Filteri i Tabela termina -->
+                    <VBox spacing="12.0" HBox.hgrow="ALWAYS">
+                        <!-- Traka za filtriranje i brzu akciju -->
+                        <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="card">
+                            <Label text="📅 Datum:" style="-fx-font-weight: bold;" />
+                            <DatePicker fx:id="filterDatePicker" promptText="Izaberite datum..." />
+
+                            <Label text="Status:" style="-fx-font-weight: bold;" />
+                            <ComboBox fx:id="filterStatusCombo" promptText="Svi statusi" />
+
+                            <Button onAction="#handleApplyAppointmentFilter" styleClass="btn-primary" text="🔍 Primeni filter" />
+                            <Button onAction="#handleResetAppointmentFilter" styleClass="btn-secondary" text="Prikaži sve" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Button onAction="#handleNewAppointmentClick" styleClass="btn-primary" text="➕ Novi termin" />
+                        </HBox>
+
+                        <TableView fx:id="appointmentsTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colAppId" prefWidth="45.0" text="ID" />
+                                <TableColumn fx:id="colAppDate" prefWidth="90.0" text="Datum" />
+                                <TableColumn fx:id="colAppTime" prefWidth="65.0" text="Vreme" />
+                                <TableColumn fx:id="colAppCustomer" prefWidth="140.0" text="Klijent" />
+                                <TableColumn fx:id="colAppVehicle" prefWidth="160.0" text="Vozilo" />
+                                <TableColumn fx:id="colAppEmployee" prefWidth="130.0" text="Serviser" />
+                                <TableColumn fx:id="colAppService" prefWidth="150.0" text="Usluga" />
+                                <TableColumn fx:id="colAppStatus" prefWidth="100.0" text="Status" />
+                                <TableColumn fx:id="colAppPrice" prefWidth="90.0" text="Cena (RSD)" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Desna strana: Forma za zakazivanje u ScrollPane-u -->
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" minWidth="350.0" prefWidth="370.0" style="-fx-background-color: transparent;">
+                        <VBox spacing="11.0" styleClass="card">
+                            <Label styleClass="card-title" text="📅 Zakazivanje / Izmena Termina" />
+                            <Separator />
+
+                            <VBox spacing="4.0">
+                                <Label text="Klijent: *" style="-fx-font-weight: bold;" />
+                                <ComboBox fx:id="appCustomerCombo" maxWidth="Infinity" promptText="Izaberite klijenta..." />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Vozilo: *" style="-fx-font-weight: bold;" />
+                                <ComboBox fx:id="appVehicleCombo" maxWidth="Infinity" promptText="Izaberite vozilo klijenta..." />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Servisna usluga: *" style="-fx-font-weight: bold;" />
+                                <ComboBox fx:id="appServiceCombo" maxWidth="Infinity" promptText="Izaberite uslugu..." />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Dodeljeni serviser: *" style="-fx-font-weight: bold;" />
+                                <ComboBox fx:id="appEmployeeCombo" maxWidth="Infinity" promptText="Izaberite servisera..." />
+                            </VBox>
+
+                            <HBox spacing="10.0">
+                                <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                    <Label text="Datum: *" style="-fx-font-weight: bold;" />
+                                    <DatePicker fx:id="appDatePicker" maxWidth="Infinity" promptText="Izaberite datum..." />
+                                </VBox>
+                                <VBox spacing="4.0" prefWidth="120.0">
+                                    <Label text="Vreme: *" style="-fx-font-weight: bold;" />
+                                    <ComboBox fx:id="appTimeCombo" maxWidth="Infinity" promptText="HH:mm" />
+                                </VBox>
+                            </HBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Dodatni delovi/troškovi (RSD):" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="appPartsPriceField" promptText="0.00" text="0" />
+                            </VBox>
+
+                            <VBox spacing="4.0">
+                                <Label text="Napomene klijenta:" style="-fx-font-weight: bold;" />
+                                <TextField fx:id="appNotesField" promptText="Opis problema ili posebni zahtevi..." />
+                            </VBox>
+
+                            <!-- Prikaz kalkulacije cene -->
+                            <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #f8fafc; -fx-padding: 8px 12px; -fx-background-radius: 6px; -fx-border-color: #cbd5e1; -fx-border-radius: 6px;">
+                                <Label text="Ukupna cena:" style="-fx-font-weight: bold;" />
+                                <Label fx:id="appCalculatedPriceLabel" text="0.00 RSD" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #16a34a;" />
+                            </HBox>
+
+                            <!-- Dugmad za akcije -->
+                            <VBox spacing="8.0" style="-fx-padding: 8px 0 0 0;">
+                                <Button maxWidth="Infinity" onAction="#handleBookAppointment" styleClass="btn-primary" style="-fx-font-size: 14px; -fx-padding: 10px 16px;" text="➕ Zakaži novi termin" />
+                                <Button maxWidth="Infinity" onAction="#handleUpdateAppointment" styleClass="btn-warning" text="✏️ Sačuvaj izmene termina" />
+                                <HBox spacing="8.0">
+                                    <Button maxWidth="Infinity" onAction="#handleCompleteAppointment" styleClass="btn-success" text="✅ Završi" HBox.hgrow="ALWAYS" />
+                                    <Button maxWidth="Infinity" onAction="#handleCancelAppointment" styleClass="btn-warning" text="❌ Otkaži" HBox.hgrow="ALWAYS" />
+                                </HBox>
+                                <HBox spacing="8.0">
+                                    <Button maxWidth="Infinity" onAction="#handleDeleteAppointment" styleClass="btn-danger" text="🗑️ Obriši" HBox.hgrow="ALWAYS" />
+                                    <Button maxWidth="Infinity" onAction="#handleClearAppointmentForm" styleClass="btn-secondary" text="🧹 Očisti formu" HBox.hgrow="ALWAYS" />
+                                </HBox>
+                            </VBox>
+                        </VBox>
+                    </ScrollPane>
+                </HBox>
+            </Tab>
+
+            <!-- ==================================================== -->
+            <!-- TAB 7: POSLOVNA STATISTIKA                           -->
+            <!-- ==================================================== -->
+            <Tab text="📈 Statistika">
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+                    <VBox spacing="20.0">
+                        <padding>
+                            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                        </padding>
+
+                        <!-- Gornji KPI pokazatelji -->
+                        <GridPane hgap="16.0" vgap="16.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="20.0" />
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="20.0" />
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="20.0" />
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="20.0" />
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="20.0" />
+                            </columnConstraints>
+
+                            <!-- 1. Ukupno -->
+                            <VBox alignment="CENTER" spacing="4.0" styleClass="kpi-card" GridPane.columnIndex="0">
+                                <Label styleClass="kpi-title" text="UKUPNO TERMINA" />
+                                <Label fx:id="statTotalAppointments" styleClass="kpi-value" text="0" />
+                            </VBox>
+
+                            <!-- 2. Završeno -->
+                            <VBox alignment="CENTER" spacing="4.0" styleClass="kpi-card" GridPane.columnIndex="1">
+                                <Label styleClass="kpi-title" text="ZAVRŠENI SERVISI" />
+                                <Label fx:id="statCompletedAppointments" styleClass="kpi-value" text="0" style="-fx-text-fill: #16a34a;" />
+                            </VBox>
+
+                            <!-- 3. Otkazano -->
+                            <VBox alignment="CENTER" spacing="4.0" styleClass="kpi-card" GridPane.columnIndex="2">
+                                <Label styleClass="kpi-title" text="OTKAZANI TERMINI" />
+                                <Label fx:id="statCancelledAppointments" styleClass="kpi-value" text="0" style="-fx-text-fill: #dc2626;" />
+                            </VBox>
+
+                            <!-- 4. Uspešnost -->
+                            <VBox alignment="CENTER" spacing="4.0" styleClass="kpi-card" GridPane.columnIndex="3">
+                                <Label styleClass="kpi-title" text="USPEŠNOST SERVISA" />
+                                <Label fx:id="statCompletionRate" styleClass="kpi-value" text="0%" style="-fx-text-fill: #2563eb;" />
+                            </VBox>
+
+                            <!-- 5. Prihod -->
+                            <VBox alignment="CENTER" spacing="4.0" styleClass="kpi-card" GridPane.columnIndex="4">
+                                <Label styleClass="kpi-title" text="UKUPNA ZARADA" />
+                                <Label fx:id="statTotalRevenue" styleClass="kpi-value" text="0.00 RSD" style="-fx-text-fill: #0d9488;" />
+                            </VBox>
+                        </GridPane>
+
+                        <!-- Grafikoni -->
+                        <HBox spacing="16.0">
+                            <!-- PieChart: Statusi -->
+                            <VBox alignment="CENTER" spacing="10.0" styleClass="card" HBox.hgrow="ALWAYS">
+                                <Label styleClass="card-title" text="Raspodela Termina po Statusima" />
+                                <PieChart fx:id="statusPieChart" labelsVisible="false" legendVisible="true" prefHeight="320.0" />
+                            </VBox>
+
+                            <!-- BarChart: Popularnost usluga -->
+                            <VBox alignment="CENTER" spacing="10.0" styleClass="card" HBox.hgrow="ALWAYS">
+                                <Label styleClass="card-title" text="Učestalost Izvršavanja Usluga" />
+                                <BarChart fx:id="servicesBarChart" prefHeight="320.0">
+                                    <xAxis>
+                                        <CategoryAxis label="Usluga" />
+                                    </xAxis>
+                                    <yAxis>
+                                        <NumberAxis label="Broj termina" />
+                                    </yAxis>
+                                </BarChart>
+                            </VBox>
+                        </HBox>
+
+                        <HBox alignment="CENTER_RIGHT">
+                            <Button onAction="#refreshStatistics" styleClass="btn-primary" text="🔄 Osveži statistiku i grafikone" />
+                        </HBox>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+
+            <!-- ==================================================== -->
+            <!-- TAB 8: JSOUP VESTI I SAVETI                          -->
+            <!-- ==================================================== -->
+            <Tab text="🌐 Auto Vesti &amp; Saveti (Jsoup)">
+                <VBox spacing="16.0">
+                    <padding>
+                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                    </padding>
+
+                    <!-- Info traka -->
+                    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="card">
+                        <Label text="🌐" style="-fx-font-size: 24px;" />
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label text="Aktuelne servisne vesti i saveti o održavanju vozila" style="-fx-font-weight: bold; -fx-font-size: 14px;" />
+                            <Label text="Preuzeto u realnom vremenu sa interneta korišćenjem Jsoup biblioteke za HTML scraping." style="-fx-text-fill: #64748b; -fx-font-size: 12px;" />
+                        </VBox>
+                        <Button onAction="#handleRefreshNews" styleClass="btn-primary" text="🔄 Osveži vesti sa weba" />
+                    </HBox>
+
+                    <!-- Lista vesti -->
+                    <ListView fx:id="newsListView" VBox.vgrow="ALWAYS" />
+
+                    <!-- Donja traka sa linkom -->
+                    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                        <Button fx:id="openNewsLinkButton" onAction="#handleOpenSelectedNews" styleClass="btn-secondary" text="🔗 Otvori izabrani članak u pretraživaču" />
+                    </HBox>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>

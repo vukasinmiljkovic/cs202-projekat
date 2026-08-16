@@ -1,0 +1,9 @@
+rs.autoservice
+rs.autoservice.client
+rs.autoservice.controller
+rs.autoservice.dao
+rs.autoservice.database
+rs.autoservice.model
+rs.autoservice.server
+rs.autoservice.service
+rs.autoservice.util

@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"rs.autoservice"},{"l":"rs.autoservice.client"},{"l":"rs.autoservice.controller"},{"l":"rs.autoservice.dao"},{"l":"rs.autoservice.database"},{"l":"rs.autoservice.model"},{"l":"rs.autoservice.server"},{"l":"rs.autoservice.service"},{"l":"rs.autoservice.util"}];updateSearchResults();
